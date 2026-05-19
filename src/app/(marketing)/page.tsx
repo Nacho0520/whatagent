@@ -18,7 +18,7 @@ const FEATURES = [
 ]
 
 const FAQ = [
-  { q: '¿Necesito una cuenta de WhatsApp Business?', a: 'Sí, necesitas un número de WhatsApp Business conectado a Meta Cloud API. Te ayudamos paso a paso durante el onboarding.' },
+  { q: '¿Necesito una cuenta de WhatsApp Business?', a: 'Sí, necesitas un número de WhatsApp Business. Te ayudamos a conectarlo vía Twilio paso a paso durante el onboarding.' },
   { q: '¿La IA puede inventar precios o información?', a: 'No. El agente está restringido a la información que tú configures. Si no sabe algo, escalará a un humano.' },
   { q: '¿Cuánto tarda en estar listo?', a: 'Menos de 30 minutos. El onboarding tiene 5 pasos y la mayoría se completa en una sentada.' },
   { q: '¿Qué pasa si llegas al límite de tu plan?', a: 'Te avisamos al 80% para que decidas si actualizar. Si superas el límite, la IA se pausa hasta el siguiente ciclo.' },
@@ -40,7 +40,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-emerald-950/30 dark:via-slate-950 dark:to-blue-950/30" />
         <div className="max-w-6xl mx-auto px-4 py-20 md:py-32 text-center">
           <Badge variant="secondary" className="mb-4">
-            <Sparkles className="w-3 h-3 mr-1" /> Powered by Claude
+            <Sparkles className="w-3 h-3 mr-1" /> Powered by OpenAI
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
             Tu recepcionista de<br />
@@ -96,7 +96,7 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold mb-12">En 3 pasos</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { n: 1, t: 'Conecta WhatsApp', d: 'Vincula tu número Business vía Meta Cloud API en minutos.' },
+              { n: 1, t: 'Conecta WhatsApp', d: 'Vincula tu número de WhatsApp Business en minutos vía Twilio.' },
               { n: 2, t: 'Configura el agente', d: 'Cuéntale a la IA sobre tu negocio, servicios y horarios.' },
               { n: 3, t: 'Activa', d: 'Empieza a recibir mensajes. La IA responde y reserva sola.' },
             ].map((s) => (

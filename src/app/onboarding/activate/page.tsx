@@ -30,11 +30,17 @@ export default function OnboardingActivate() {
   const activate = async (planKey: string) => {
     setLoading(planKey)
     if (planKey === 'trial') {
-      await fetch('/api/dashboard/business', {
+      const r = await fetch('/api/dashboard/business', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ onboarding_completed: true }),
+        body: JSON.stringify({ onboarding_completed: true, is_active: true }),
       })
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}))
+        toast.error((err as { error?: string }).error ?? 'Error al activar. Inténtalo de nuevo.')
+        setLoading(null)
+        return
+      }
       toast.success('¡Activado! Empieza a recibir mensajes.')
       push('/dashboard')
       return

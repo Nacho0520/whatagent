@@ -27,11 +27,24 @@ type FormData = z.infer<typeof schema>
 export default function RegisterPage() {
   const { push, refresh } = useRouter()
   const [loading, setLoading] = useState(false)
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
+  const password = watch('password')
+
   const onSubmit = async (data: FormData) => {
+    if (data.password !== confirmPassword) {
+      toast.error('Las contraseñas no coinciden')
+      return
+    }
+    if (!acceptedTerms) {
+      toast.error('Debes aceptar los Términos de Servicio y la Política de Privacidad')
+      return
+    }
+
     setLoading(true)
     const supabase = createClient()
     const { error } = await supabase.auth.signUp({
@@ -93,7 +106,42 @@ export default function RegisterPage() {
             <Input id="password" type="password" autoComplete="new-password" {...register('password')} />
             {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Repite tu contraseña"
+              required
+            />
+            {password && confirmPassword && password !== confirmPassword && (
+              <p className="text-xs text-destructive">Las contraseñas no coinciden</p>
+            )}
+          </div>
+          <div className="flex items-start gap-2">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              required
+              className="mt-1"
+            />
+            <label htmlFor="terms" className="text-sm text-muted-foreground">
+              Acepto los{' '}
+              <a href="/terms" target="_blank" className="underline hover:text-foreground">
+                Términos de Servicio
+              </a>{' '}
+              y la{' '}
+              <a href="/privacy" target="_blank" className="underline hover:text-foreground">
+                Política de Privacidad
+              </a>
+            </label>
+          </div>
+          <Button type="submit" className="w-full" disabled={loading || !acceptedTerms}>
             {loading ? 'Creando cuenta…' : 'Crear cuenta'}
           </Button>
         </form>

@@ -26,7 +26,7 @@ export async function PATCH(req: NextRequest) {
     'name', 'industry', 'city', 'phone', 'email', 'website',
     'agent_name', 'agent_persona', 'business_context', 'agent_tone',
     'escalation_phone', 'escalation_email',
-    'onboarding_step', 'onboarding_completed',
+    'onboarding_step', 'onboarding_completed', 'is_active',
     'twilio_account_sid', 'twilio_auth_token', 'twilio_whatsapp_number',
   ])
   const body = (await req.json()) as Record<string, unknown>

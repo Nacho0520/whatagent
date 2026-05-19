@@ -1,11 +1,7 @@
-// Pricing per 1M tokens in USD (microcents = USD * 1e8)
-// Verify against https://www.anthropic.com/pricing#anthropic-api
+// OpenAI pricing per 1M tokens in USD (as of 2025)
 const PRICING = {
-  'claude-haiku-4-5-20251001': { input: 1, output: 5 },
-  'claude-sonnet-4-6': { input: 3, output: 15 },
-  // Fallback / generic
-  'claude-haiku': { input: 1, output: 5 },
-  'claude-sonnet': { input: 3, output: 15 },
+  'gpt-4o-mini': { input: 0.15, output: 0.60 },
+  'gpt-4o': { input: 2.50, output: 10.00 },
 } as const
 
 const EUR_PER_USD = 0.92
@@ -15,7 +11,7 @@ export function calculateAnthropicCost(
   outputTokens: number,
   model: string
 ): number {
-  const key = (Object.keys(PRICING) as Array<keyof typeof PRICING>).find((k) => model.includes(k.replace(/^claude-/, ''))) ?? 'claude-haiku'
+  const key = (Object.keys(PRICING) as Array<keyof typeof PRICING>).find((k) => model.includes(k)) ?? 'gpt-4o-mini'
   const rates = PRICING[key]
   const usd = (inputTokens / 1_000_000) * rates.input + (outputTokens / 1_000_000) * rates.output
   const eur = usd * EUR_PER_USD

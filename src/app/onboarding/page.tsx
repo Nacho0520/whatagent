@@ -71,17 +71,23 @@ export default function OnboardingStep1() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true)
-    const res = await fetch('/api/dashboard/business', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, onboarding_step: 2 }),
-    })
-    setLoading(false)
-    if (!res.ok) {
-      toast.error('No se pudo guardar')
-      return
+    try {
+      const res = await fetch('/api/dashboard/business', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, onboarding_step: 2 }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        toast.error((err as { message?: string }).message ?? 'No se pudo guardar')
+        return
+      }
+      push('/onboarding/whatsapp')
+    } catch {
+      toast.error('Error de conexión. Inténtalo de nuevo.')
+    } finally {
+      setLoading(false)
     }
-    push('/onboarding/whatsapp')
   }
 
   return (

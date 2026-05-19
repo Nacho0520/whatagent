@@ -1,11 +1,11 @@
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import type { AgentResponse, ConversationContext } from '@/types/ai'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 })
 
-const GENERATOR_MODEL = 'claude-sonnet-4-6'
+const GENERATOR_MODEL = 'gpt-4o'
 const MAX_HISTORY = 6
 
 const SAFE_FALLBACK =
@@ -19,25 +19,24 @@ export async function generateResponse(
   try {
     const history = conversationHistory.slice(-MAX_HISTORY)
 
-    const messages = [
+    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+      { role: 'system', content: systemPrompt },
       ...history.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-      { role: 'user' as const, content: currentMessage },
+      { role: 'user', content: currentMessage },
     ]
 
-    const response = await anthropic.messages.create({
+    const response = await openai.chat.completions.create({
       model: GENERATOR_MODEL,
       max_tokens: 600,
-      system: systemPrompt,
       messages,
     })
 
-    const textBlock = response.content.find((b) => b.type === 'text')
-    const content = textBlock?.type === 'text' ? textBlock.text.trim() : SAFE_FALLBACK
+    const content = response.choices[0].message.content?.trim() ?? SAFE_FALLBACK
 
     return {
       content,
-      inputTokens: response.usage.input_tokens,
-      outputTokens: response.usage.output_tokens,
+      inputTokens: response.usage?.prompt_tokens ?? 0,
+      outputTokens: response.usage?.completion_tokens ?? 0,
       model: GENERATOR_MODEL,
     }
   } catch (error) {

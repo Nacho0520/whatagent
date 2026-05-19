@@ -1,12 +1,12 @@
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import type { ClassificationResult, ConversationContext, Intent } from '@/types/ai'
 import type { Service } from '@/types/database'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 })
 
-const CLASSIFIER_MODEL = 'claude-haiku-4-5-20251001'
+const CLASSIFIER_MODEL = 'gpt-4o-mini'
 
 const VALID_INTENTS: Intent[] = [
   'BOOK_APPOINTMENT',
@@ -91,15 +91,16 @@ export async function classifyIntent(
   }`
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await openai.chat.completions.create({
       model: CLASSIFIER_MODEL,
       max_tokens: 200,
-      system: CLASSIFIER_SYSTEM,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [
+        { role: 'system', content: CLASSIFIER_SYSTEM },
+        { role: 'user', content: userPrompt },
+      ],
     })
 
-    const textBlock = response.content.find((b) => b.type === 'text')
-    const raw = textBlock?.type === 'text' ? textBlock.text.trim() : ''
+    const raw = response.choices[0].message.content?.trim() ?? ''
     const jsonMatch = raw.match(/\{[\s\S]*\}/)
     if (!jsonMatch) throw new Error('No JSON found in classifier response')
 
@@ -117,8 +118,8 @@ export async function classifyIntent(
       requiresEscalation: intent === 'COMPLAINT' || confidence < 0.5,
       selectedSlotIndex: parsed.selectedSlotIndex,
       serviceMention: parsed.serviceMention,
-      inputTokens: response.usage.input_tokens,
-      outputTokens: response.usage.output_tokens,
+      inputTokens: response.usage?.prompt_tokens ?? 0,
+      outputTokens: response.usage?.completion_tokens ?? 0,
     }
   } catch (error) {
     console.error('[Classifier] Error', { error: error instanceof Error ? error.message : error })
