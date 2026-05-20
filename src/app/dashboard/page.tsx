@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -23,11 +23,10 @@ export default function DashboardHome() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [recentConvs, setRecentConvs] = useState<Array<{ id: string; customer_phone: string; status: string; last_message_at: string }>>([])
   const [upcomingAppts, setUpcomingAppts] = useState<Array<{ id: string; customer_name: string | null; customer_phone: string; scheduled_at: string }>>([])
-  const dateFormatter = useSyncExternalStore(
-    () => () => {},
-    () => (date: string) => new Date(date).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }),
-    () => () => ''
-  )
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => { setIsMounted(true) }, [])
+  const dateFormatter = (date: string) =>
+    isMounted ? new Date(date).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''
 
   useEffect(() => {
     void Promise.all([

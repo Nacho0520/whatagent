@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -33,11 +33,10 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function AppointmentsPage() {
   const [items, setItems] = useState<Appointment[]>([])
-  const dateFormatter = useSyncExternalStore(
-    () => () => {},
-    () => (date: string) => new Date(date).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }),
-    () => () => ''
-  )
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => { setIsMounted(true) }, [])
+  const dateFormatter = (date: string) =>
+    isMounted ? new Date(date).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : ''
 
   useEffect(() => {
     void fetch('/api/dashboard/appointments').then((r) => r.json()).then((d) => setItems(d.appointments ?? []))

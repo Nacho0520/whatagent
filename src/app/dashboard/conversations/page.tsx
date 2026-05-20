@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -28,11 +28,10 @@ export default function ConversationsPage() {
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('all')
   const [loading, setLoading] = useState(true)
-  const dateFormatter = useSyncExternalStore(
-    () => () => {},
-    () => (date: string) => new Date(date).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }),
-    () => () => ''
-  )
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => { setIsMounted(true) }, [])
+  const dateFormatter = (date: string) =>
+    isMounted ? new Date(date).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : ''
 
   useEffect(() => {
     setLoading(true)
