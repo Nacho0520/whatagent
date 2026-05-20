@@ -40,8 +40,10 @@ export async function PATCH(req: NextRequest) {
 
   const { data, error } = await supabase
     .from('businesses')
-    .update(update)
-    .eq('owner_id', user.id)
+    .upsert(
+      { ...update, owner_id: user.id },
+      { onConflict: 'owner_id' }
+    )
     .select()
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

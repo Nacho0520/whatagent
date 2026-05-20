@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardSidebar } from '@/components/dashboard-sidebar'
-import { Toaster } from '@/components/ui/sonner'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -39,8 +38,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         <main className="flex-1 p-6">{children}</main>
       </div>
-
-      <Toaster richColors />
     </div>
   )
 }

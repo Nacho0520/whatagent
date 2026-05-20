@@ -13,6 +13,29 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+function getAuthErrorMessage(error: { message?: string; status?: number }): string {
+  const msg = error.message?.toLowerCase() ?? ''
+  if (msg.includes('rate limit') || error.status === 429) {
+    return 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.'
+  }
+  if (msg.includes('already registered') || msg.includes('user already exists')) {
+    return 'Este email ya está registrado. Prueba a iniciar sesión.'
+  }
+  if (msg.includes('invalid login credentials') || msg.includes('invalid credentials')) {
+    return 'Email o contraseña incorrectos.'
+  }
+  if (msg.includes('email not confirmed')) {
+    return 'Confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada.'
+  }
+  if (msg.includes('password') && msg.includes('weak')) {
+    return 'La contraseña es demasiado débil. Usa al menos 8 caracteres con letras y números.'
+  }
+  if (msg.includes('network') || msg.includes('fetch')) {
+    return 'Error de conexión. Comprueba tu internet e inténtalo de nuevo.'
+  }
+  return 'Ha ocurrido un error. Inténtalo de nuevo.'
+}
+
 const schema = z.object({
   businessName: z.string().min(2, { error: 'Nombre demasiado corto' }),
   email: z.email({ error: 'Email no válido' }),
@@ -58,7 +81,7 @@ export default function RegisterPage() {
 
     if (error) {
       setLoading(false)
-      toast.error(error.message)
+      toast.error(getAuthErrorMessage(error))
       return
     }
 
